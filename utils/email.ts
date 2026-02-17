@@ -84,8 +84,8 @@ export async function sendWaitlistConfirmation(userData: EmailData) {
             }
             
             .brand-logo {
-              width: 64px;
-              height: 64px;
+              width: 48px;
+              height: 48px;
               display: inline-block;
             }
             
@@ -94,6 +94,7 @@ export async function sendWaitlistConfirmation(userData: EmailData) {
               font-weight: 600;
               color: #ffffff;
               letter-spacing: -0.025em;
+              margin: 0 4px;
             }
             
             .brand-name span {
