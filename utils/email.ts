@@ -1,43 +1,10 @@
-import nodemailer from 'nodemailer';
-
 interface EmailData {
   name: string;
   email: string;
   city?: string;
 }
 
-// Create transporter with debug options for production
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: process.env.SMTP_SECURE === 'true',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  // Add these for better production debugging
-  debug: process.env.NODE_ENV === 'development', // Only debug in dev
-  logger: process.env.NODE_ENV === 'development', // Only log in dev
-  // Add TLS options for production
-  tls: {
-    rejectUnauthorized: process.env.NODE_ENV === 'production', // Stricter in prod
-  },
-});
-
-// Verify connection on startup (optional)
-if (process.env.NODE_ENV === 'production') {
-  transporter.verify((error, success) => {
-    if (error) {
-      console.error('SMTP connection error:', error);
-    } else {
-      console.log('SMTP server is ready to send emails');
-    }
-  });
-}
-
 export async function sendWaitlistConfirmation(userData: EmailData) {
-  // Log attempt in production
-  console.log(`Attempting to send email to ${userData.email} from ${process.env.SMTP_FROM_EMAIL}`);
   
   try {
     const htmlTemplate = `
@@ -78,7 +45,7 @@ export async function sendWaitlistConfirmation(userData: EmailData) {
               display: inline-flex;
               align-items: center;
               justify-content: center;
-              gap: 8px;
+              gap: 12px;
               margin: 0 auto 24px auto;
               text-align: left;
             }
@@ -94,7 +61,6 @@ export async function sendWaitlistConfirmation(userData: EmailData) {
               font-weight: 600;
               color: #ffffff;
               letter-spacing: -0.025em;
-              margin: 0 4px;
             }
             
             .brand-name span {
@@ -335,12 +301,12 @@ export async function sendWaitlistConfirmation(userData: EmailData) {
               }
               
               .brand-logo {
-                width: 28px;
-                height: 28px;
+                width: 32px;
+                height: 32px;
               }
               
               .brand-name {
-                font-size: 16px;
+                font-size: 24px;
               }
             }
           </style>
@@ -349,8 +315,8 @@ export async function sendWaitlistConfirmation(userData: EmailData) {
           <div class="container">
             <div class="header">
               <div class="brand-container">
-                <img src="https://safespora.com/safespora.png" alt="safespora logo" class="brand-logo" width="64" height="64">
-                <span class="brand-name">SafeSpora</span>
+                <img src="https://safespora.com/safespora.png" alt="safespora logo" class="brand-logo" width="48" height="48">
+                <span class="brand-name">Safe<span>Spora</span></span>
               </div>
               <h1>You're on the waitlist</h1>
               <div class="subhead">Awareness is the first line of defense</div>
@@ -458,46 +424,80 @@ export async function sendWaitlistConfirmation(userData: EmailData) {
       </html>
     `;
 
-    const mailOptions = {
-      from: `"SafeSpora" <${process.env.SMTP_FROM_EMAIL}>`,
-      to: userData.email,
-      subject: 'You\'re on the SafeSpora waitlist',
-      html: htmlTemplate,
-      text: `
-        ${userData.name},
+    const textVersion = `
+      ${userData.name},
 
-        Thank you for joining SafeSpora. You are now part of a community committed to building safer Nigerian neighborhoods through shared awareness and responsible information.
+      Thank you for joining SafeSpora. You are now part of a community committed to building safer Nigerian neighborhoods through shared awareness and responsible information.
 
-        ${userData.city ? `We're actively working to bring SafeSpora's real-time alerts to ${userData.city}. You'll be among the first to know when we launch in your area.` : 'SafeSpora is expanding across Nigerian cities. Help us prioritize your area by sharing the waitlist.'}
+      ${userData.city ? `We're actively working to bring SafeSpora's real-time alerts to ${userData.city}. You'll be among the first to know when we launch in your area.` : 'SafeSpora is expanding across Nigerian cities. Help us prioritize your area by sharing the waitlist.'}
 
-        HOW SAFESPORA WORKS:
-        • Select locations you care about (home, work, daily routes)
-        • Receive relevant alerts based on proximity, not noise
-        • Make safer decisions: delay, reroute, or stay alert
-        • Community-driven reports, not anonymous messages
+      HOW SAFESPORA WORKS:
+      • Select locations you care about (home, work, daily routes)
+      • Receive relevant alerts based on proximity, not noise
+      • Make safer decisions: delay, reroute, or stay alert
+      • Community-driven reports, not anonymous messages
 
-        WHAT TO EXPECT:
-        • Early access when we launch in your area
-        • Updates on our progress and city expansion
-        • Invitations to share feedback
-        • Knowledge that you're helping build safer communities
+      WHAT TO EXPECT:
+      • Early access when we launch in your area
+      • Updates on our progress and city expansion
+      • Invitations to share feedback
+      • Knowledge that you're helping build safer communities
 
-        IMPORTANT: SafeSpora is a tool for awareness, NOT a replacement for emergency services. Always call official numbers in emergencies.
+      IMPORTANT: SafeSpora is a tool for awareness, NOT a replacement for emergency services. Always call official numbers in emergencies.
 
-        "Awareness is the first line of defense."
+      "Awareness is the first line of defense."
 
-        © ${new Date().getFullYear()} SafeSpora
-      `,
-    };
+      © ${new Date().getFullYear()} SafeSpora
+    `;
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully to:', userData.email, 'Message ID:', info.messageId);
-    return { success: true, messageId: info.messageId };
+    // ZeptoMail API endpoint - using the correct format from their docs
+    const response = await fetch('https://api.zeptomail.com/v1.1/email', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': process.env.ZEPTOMAIL_TOKEN!, // Just the token, no Bearer prefix needed
+      },
+      body: JSON.stringify({
+        from: {
+          address: process.env.ZEPTOMAIL_FROM_EMAIL || 'noreply@safespora.com',
+          name: 'SafeSpora'
+        },
+        to: [
+          {
+            email_address: {
+              address: userData.email,
+              name: userData.name
+            }
+          }
+        ],
+        subject: 'You\'re on the SafeSpora waitlist',
+        htmlbody: htmlTemplate,
+        textbody: textVersion,
+        track_clicks: true,
+        track_opens: true
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error('ZeptoMail API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        data: data
+      });
+      return { 
+        success: false, 
+        error: data,
+        status: response.status 
+      };
+    }
+    return { success: true, data };
 
   } catch (error) {
     console.error('Failed to send email to:', userData.email, 'Error:', error);
     
-    // Log more details for production debugging
     if (error instanceof Error) {
       console.error('Error name:', error.name);
       console.error('Error message:', error.message);
