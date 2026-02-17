@@ -20,7 +20,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <Siren size={22} weight="fill" className="text-red-500" />
+          <img src="/safespora.svg" className="h-8 w-8 md:h-8 md:w-8" alt="safespora logo" />
           <span className="font-semibold text-lg tracking-tight">
             SafeSpora
           </span>
