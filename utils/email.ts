@@ -6,6 +6,7 @@ interface EmailData {
   city?: string;
 }
 
+// Create transporter with debug options for production
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: parseInt(process.env.SMTP_PORT || '587'),
@@ -14,9 +15,30 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  // Add these for better production debugging
+  debug: process.env.NODE_ENV === 'development', // Only debug in dev
+  logger: process.env.NODE_ENV === 'development', // Only log in dev
+  // Add TLS options for production
+  tls: {
+    rejectUnauthorized: process.env.NODE_ENV === 'production', // Stricter in prod
+  },
 });
 
+// Verify connection on startup (optional)
+if (process.env.NODE_ENV === 'production') {
+  transporter.verify((error, success) => {
+    if (error) {
+      console.error('SMTP connection error:', error);
+    } else {
+      console.log('SMTP server is ready to send emails');
+    }
+  });
+}
+
 export async function sendWaitlistConfirmation(userData: EmailData) {
+  // Log attempt in production
+  console.log(`Attempting to send email to ${userData.email} from ${process.env.SMTP_FROM_EMAIL}`);
+  
   try {
     const htmlTemplate = `
       <!DOCTYPE html>
@@ -62,13 +84,13 @@ export async function sendWaitlistConfirmation(userData: EmailData) {
             }
             
             .brand-logo {
-              width: 32px;
-              height: 32px;
+              width: 64px;
+              height: 64px;
               display: inline-block;
             }
             
             .brand-name {
-              font-size: 18px;
+              font-size: 36px;
               font-weight: 600;
               color: #ffffff;
               letter-spacing: -0.025em;
@@ -326,8 +348,8 @@ export async function sendWaitlistConfirmation(userData: EmailData) {
           <div class="container">
             <div class="header">
               <div class="brand-container">
-                <img src="https://safespora.com/safespora.png" alt="safespora logo" class="brand-logo" width="32" height="32">
-                <span class="brand-name"><span>SafeSpora</span></span>
+                <img src="https://safespora.com/safespora.png" alt="safespora logo" class="brand-logo" width="64" height="64">
+                <span class="brand-name">SafeSpora</span>
               </div>
               <h1>You're on the waitlist</h1>
               <div class="subhead">Awareness is the first line of defense</div>
@@ -468,11 +490,19 @@ export async function sendWaitlistConfirmation(userData: EmailData) {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully:', info.messageId);
+    console.log('Email sent successfully to:', userData.email, 'Message ID:', info.messageId);
     return { success: true, messageId: info.messageId };
 
   } catch (error) {
-    console.error('Failed to send email:', error);
+    console.error('Failed to send email to:', userData.email, 'Error:', error);
+    
+    // Log more details for production debugging
+    if (error instanceof Error) {
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
+    
     return { success: false, error };
   }
 }
