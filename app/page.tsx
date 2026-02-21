@@ -9,7 +9,7 @@ import Footer from "@/components/Footer";
 export default function Home() {
   return (
     <main className="bg-[#0B0C0F] text-white">
-        <Header />
+      <Header />
       <Hero />
       <HowItWorks />
       <LiveAlerts />

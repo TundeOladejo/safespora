@@ -23,7 +23,7 @@ export default function Hero() {
 
             <div className="relative w-full max-w-7xl mx-auto">
                 {/* Badge */}
-                <div className="flex items-center gap-2 text-red-500 mb-6">
+                <div className="flex items-center gap-2 text-red-500 mt-6 md:mt-0 mb-6">
                     <Siren size={22} weight="fill" />
                     <span className="text-sm font-semibold tracking-wide">
                         REAL-TIME COMMUNITY SAFETY ALERTS
