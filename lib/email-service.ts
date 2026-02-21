@@ -1,121 +1,146 @@
 // lib/email-service.ts
+import { SendMailClient } from "zeptomail";
+
+// Define proper types for ZeptoMail responses
+interface ZeptoMailResponse {
+  data?: Array<{
+    message_id?: string;
+    [key: string]: any;
+  }>;
+  message?: string;
+  error?: {
+    message: string;
+    code?: string;
+  };
+  request_id?: string;
+  [key: string]: any;
+}
+
 export interface SendEmailOptions {
   to: string | string[];
   subject: string;
   html: string;
   text?: string;
   replyTo?: string;
-  cc?: string | string[];
-  bcc?: string | string[];
 }
 
 export interface EmailResponse {
   success: boolean;
   messageId?: string;
   error?: string;
+  details?: any;
 }
 
 class EmailService {
-  private config = {
-    apiKey: process.env.ZEPTOMAIL_API_KEY,
-    apiUrl: 'https://api.zeptomail.in/v1.1/email',
-    fromEmail: process.env.ZEPTOMAIL_FROM_EMAIL || 'noreply@safespora.com',
-    fromName: process.env.ZEPTOMAIL_FROM_NAME || 'SafeSpora Admin',
-  };
+  private client: SendMailClient;
+  private fromEmail: string;
+  private fromName: string;
 
-  /**
-   * Send an email using ZeptoMail REST API
-   */
+  constructor() {
+    const url = "https://api.zeptomail.com/v1.1/email";
+    // The token should include the "Zoho-enczapikey" prefix as shown in the example
+    const token = process.env.ZEPTOMAIL_API_KEY || "";
+    this.client = new SendMailClient({ url, token });
+    this.fromEmail = process.env.ZEPTOMAIL_FROM_EMAIL || 'noreply@safespora.com';
+    this.fromName = process.env.ZEPTOMAIL_FROM_NAME || 'SafeSpora Admin';
+  }
+
   async sendEmail(options: SendEmailOptions): Promise<EmailResponse> {
     try {
       if (!options.to || !options.subject || !options.html) {
         throw new Error('Missing required email fields: to, subject, or html');
       }
 
-      if (!this.config.apiKey) {
-        throw new Error('ZeptoMail API key is not configured');
+      // Format recipients according to the official example
+      const recipients = (Array.isArray(options.to) ? options.to : [options.to])
+        .map(email => ({
+          email_address: {
+            address: email.trim().toLowerCase(),
+            name: "" // You can add name if available
+          }
+        }));
+
+      // Build request according to official documentation
+      const mailRequest: any = {
+        from: {
+          address: this.fromEmail,
+          name: this.fromName
+        },
+        to: recipients,
+        subject: options.subject,
+        htmlbody: options.html,
+      };
+
+      // Add text version if provided
+      if (options.text) {
+        mailRequest.textbody = options.text;
+      } else {
+        // Generate text version from HTML
+        mailRequest.textbody = this.htmlToText(options.html);
       }
 
-      const textContent = options.text || this.htmlToText(options.html);
+      // Add reply-to if provided
+      if (options.replyTo) {
+        mailRequest.reply_to = [
+          {
+            address: options.replyTo.trim().toLowerCase(),
+            name: ""
+          }
+        ];
+      }
 
-      console.log('📧 Sending email via ZeptoMail:', {
-        to: options.to,
-        subject: options.subject,
+      // Add tracking options (optional but recommended)
+      mailRequest.track_clicks = true;
+      mailRequest.track_opens = true;
+      mailRequest.client_reference = `safespora_admin_${Date.now()}`;
+
+      // Use the official client to send - properly type the response
+      const response = await this.client.sendMail(mailRequest) as ZeptoMailResponse;
+      
+      // Extract message ID safely - handle different response formats
+      let messageId: string | undefined;
+      
+      if (response?.data && Array.isArray(response.data) && response.data.length > 0) {
+        messageId = response.data[0]?.message_id;
+      } else if (response?.request_id) {
+        messageId = response.request_id;
+      } else if (response?.message_id) {
+        messageId = response.message_id;
+      } else {
+        // If we can't find a message ID, create a fallback
+        messageId = `sent-${Date.now()}`;
+        console.log('Could not extract message ID from response, using fallback');
+      }
+      
+      return {
+        success: true,
+        messageId,
+        details: response // Include full response for debugging
+      };
+
+    } catch (error: any) {
+      console.error('❌ Email sending failed:', {
+        error: error.message,
+        response: error.response?.data || error.response || error,
+        stack: error.stack
       });
 
-      return await this.sendViaZeptoMailAPI({ ...options, text: textContent });
-    } catch (error: any) {
-      console.error('❌ Email sending failed:', error.message || error);
+      // Extract detailed error information
+      let errorMessage = error.message || 'Failed to send email';
+      let errorDetails = error;
+      
+      // Check if error has response data
+      if (error.response?.data) {
+        errorDetails = error.response.data;
+        errorMessage = error.response.data.message || error.response.data.error?.message || errorMessage;
+      }
+
       return {
         success: false,
-        error: error.message || 'Failed to send email',
+        error: errorMessage,
+        details: errorDetails
       };
     }
-  }
-
-  private async sendViaZeptoMailAPI(options: SendEmailOptions): Promise<EmailResponse> {
-    const cleanApiKey = this.config.apiKey!.trim().replace(/^['"]|['"]$/g, '');
-
-    const recipients = (Array.isArray(options.to) ? options.to : [options.to])
-      .map(email => ({
-        email_address: {
-          address: email.trim().toLowerCase(),
-        }
-      }));
-
-    const requestBody: any = {
-      from: {
-        address: this.config.fromEmail.trim().toLowerCase(),
-        name: this.config.fromName,
-      },
-      to: recipients,
-      subject: options.subject,
-      htmlbody: options.html,
-      textbody: options.text,
-      track_clicks: true,
-      track_opens: true,
-      client_reference: `safespora_admin_${Date.now()}`,
-    };
-
-    if (options.replyTo) {
-      requestBody.reply_to = [{
-        address: options.replyTo.trim().toLowerCase()
-      }];
-    }
-
-    const response = await fetch(this.config.apiUrl, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': cleanApiKey,
-      },
-      body: JSON.stringify(requestBody),
-    });
-
-    const responseText = await response.text();
-    let data: any = {};
-    
-    if (responseText) {
-      try {
-        data = JSON.parse(responseText);
-      } catch (e) {
-        console.error('Failed to parse response:', responseText);
-      }
-    }
-
-    if (!response.ok) {
-      throw new Error(
-        data.error?.message || data.message || `ZeptoMail API error (${response.status})`
-      );
-    }
-
-    console.log('✅ Email sent successfully');
-
-    return {
-      success: true,
-      messageId: data.data?.[0]?.message_id || data.request_id || `zeptomail-${Date.now()}`,
-    };
   }
 
   private htmlToText(html: string): string {
