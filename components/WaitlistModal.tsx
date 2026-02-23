@@ -141,8 +141,8 @@ export default function WaitlistModal({
             Join the <span className="text-red-500">SafeSpora</span> Waitlist
           </DialogTitle>
           <DialogDescription className="text-gray-400">
-            Be among the first to know when SafeSpora launches in your city. 
-            Early access members get exclusive perks! ✨
+            Join thousands already waiting for early access to Nigeria's first 
+            community-driven safety platform. Founding members get priority alerts! ✨
           </DialogDescription>
         </DialogHeader>
 

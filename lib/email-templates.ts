@@ -131,7 +131,7 @@ export const EMAIL_TEMPLATES = {
           <li>Complete your profile setup</li>
         </ol>
 
-        <a href="${process.env.NEXT_PUBLIC_ADMIN_URL || 'https://safespora.com'}/auth/login" class="button">
+        <a href="${process.env.NEXT_PUBLIC_ADMIN_URL || 'https://safespora.com/auth/login'}" class="button">
           Access Admin Portal
         </a>
 

@@ -25,13 +25,13 @@ export default function LiveAlerts() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-red-500 font-semibold">
                 <Siren size={20} weight="fill" />
-                Suspicious Activity
+                Kidnapping Risk Alert
               </div>
               <span className="text-sm text-gray-400">4 mins ago</span>
             </div>
             <p className="mt-2 text-gray-300">
-              Lekki Phase 1 — multiple residents reporting unusual movement
-              along a commonly used street.
+              Lagos-Ibadan Expressway — multiple reports of suspicious vehicles 
+              blocking traffic near Berger area. Avoid route if possible.
             </p>
           </div>
 
@@ -40,27 +40,28 @@ export default function LiveAlerts() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-yellow-400 font-semibold">
                 <WarningCircle size={20} weight="fill" />
-                Area to Be Cautious
+                Armed Robbery Alert
               </div>
               <span className="text-sm text-gray-400">12 mins ago</span>
             </div>
             <p className="mt-2 text-gray-300">
-              Yaba — reports of increased tension near a bus stop during
-              evening hours.
+              Abuja — reports of armed men targeting vehicles at traffic lights 
+              along Airport Road. Exercise extreme caution.
             </p>
           </div>
 
           {/* Informational */}
           <div className={`${surface} p-6 rounded-lg`}>
             <div className="flex items-center justify-between">
-              <div className="font-semibold text-gray-300">
-                General Awareness
+              <div className="flex items-center gap-2 text-orange-400 font-semibold">
+                <WarningCircle size={20} weight="fill" />
+                Suspicious Checkpoint Activity
               </div>
               <span className="text-sm text-gray-400">25 mins ago</span>
             </div>
             <p className="mt-2 text-gray-400">
-              Gwarinpa — residents advising caution due to unusual gatherings
-              late at night.
+              Port Harcourt — travelers reporting unusual checkpoint behavior 
+              on East-West Road. Consider alternative routes.
             </p>
           </div>
         </div>

@@ -38,6 +38,11 @@ export default function Hero() {
                     </span>
                 </h1>
 
+                {/* Nigeria-wide scope */}
+                <p className="mt-4 text-xl text-gray-200 font-medium">
+                    Built for every state. From city streets to interstate routes.
+                </p>
+
                 {/* Description */}
                 <p className="mt-6 text-gray-300 max-w-2xl text-lg">
                     SafeSpora helps Nigerians stay informed about security incidents
@@ -78,10 +83,9 @@ export default function Hero() {
                     >
                         Join Waiting List
                     </Button>
-
-                    <Button size="lg" variant="outline">
+                    {/* <Button size="lg" variant="outline">
                         See How It Works
-                    </Button>
+                    </Button> */}
                 </div>
 
                 <WaitlistModal open={open} onOpenChange={setOpen} />

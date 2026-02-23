@@ -19,9 +19,21 @@ export default function Footer() {
           <div>
             <h4 className="font-medium mb-3">Product</h4>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li>How it works</li>
-              <li>Live alerts</li>
-              <li>Verification</li>
+              <li>
+                <Link href="#how-it-works" className="hover:text-white transition-colors">
+                  How it works
+                </Link>
+              </li>
+              <li>
+                <Link href="#alerts" className="hover:text-white transition-colors">
+                  Live alerts
+                </Link>
+              </li>
+              <li>
+                <Link href="#trust" className="hover:text-white transition-colors">
+                  Verification
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -29,9 +41,21 @@ export default function Footer() {
           <div>
             <h4 className="font-medium mb-3">Company</h4>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li>About</li>
-              <li>Contact</li>
-              <li>Careers</li>
+              <li>
+                <Link href="#trust" className="hover:text-white transition-colors">
+                  About
+                </Link>
+              </li>
+              <li>
+                <a href="mailto:contact@safespora.com" className="hover:text-white transition-colors">
+                  Contact
+                </a>
+              </li>
+              <li>
+                <a href="mailto:careers@safespora.com" className="hover:text-white transition-colors">
+                  Careers
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -39,8 +63,16 @@ export default function Footer() {
           <div>
             <h4 className="font-medium mb-3">Legal</h4>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li>Privacy Policy</li>
-              <li>Terms of Service</li>
+              <li>
+                <Link href="/privacy" className="hover:text-white transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="hover:text-white transition-colors">
+                  Terms of Service
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

@@ -49,11 +49,11 @@ export default function Trust() {
           <div className={`${surface} p-6 rounded-lg`}>
             <WarningCircle size={28} className="text-red-500 mb-4" weight="bold" />
             <h3 className="text-xl font-semibold">
-              Responsibility First
+              Verified & Filtered Reports
             </h3>
             <p className="mt-3 text-gray-400">
-              Alerts are framed for awareness, not alarm. The goal is to help
-              you stay informed and decide calmly, not to cause panic.
+              Reports are prioritized using proximity, recency, and pattern matching 
+              to reduce noise and ensure you get reliable, actionable information.
             </p>
           </div>
         </div>
