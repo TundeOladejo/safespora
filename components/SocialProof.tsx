@@ -43,12 +43,12 @@ export default function SocialProof() {
             </div>
           )}
 
-          <div className="flex items-center justify-center gap-6 text-sm text-gray-400">
-            <div className="flex items-center gap-2">
+          <div className="grid md:flex items-center justify-center gap-2 md:gap-6 text-sm text-gray-400">
+            <div className="flex items-center gap-1">
               <Star size={16} className="text-yellow-400" weight="fill" />
-              <span>Founding members get early access</span>
+              <p>Founding members get early access</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <Users size={16} className="text-green-400" weight="fill" />
               <span>Priority safety alerts</span>
             </div>

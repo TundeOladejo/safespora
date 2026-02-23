@@ -8,7 +8,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { List, Siren } from "@phosphor-icons/react";
+import { List, ListIcon, Siren } from "@phosphor-icons/react";
 import WaitlistModal from "./WaitlistModal";
 
 export default function Header() {
@@ -55,7 +55,7 @@ export default function Header() {
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
-                <List size={36} />
+                <ListIcon size={36} />
               </Button>
             </SheetTrigger>
 
