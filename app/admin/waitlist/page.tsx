@@ -23,7 +23,7 @@ async function getWaitlistData(searchQuery?: string, status?: string) {
     .order('position', { ascending: true })
 
   if (searchQuery) {
-    query = query.or(`email.ilike.%${searchQuery}%,full_name.ilike.%${searchQuery}%,state.ilike.%${searchQuery}%,city.ilike.%${searchQuery}%`)
+    query = query.or(`email.ilike.%${searchQuery}%,state.ilike.%${searchQuery}%`)
   }
 
   if (status && status !== 'all') {
@@ -141,7 +141,7 @@ export default async function WaitlistPage({
           <div className="flex-1">
             <Input
               name="search"
-              placeholder="Search by email, name, state, or city..."
+              placeholder="Search by email or state..."
               defaultValue={resolvedSearchParams.search}
               className="bg-gray-800 border-gray-700 text-white"
             />
@@ -170,13 +170,10 @@ export default async function WaitlistPage({
                   Position
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  User
+                  Email
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Contact
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Location
+                  State
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   Status
@@ -189,7 +186,7 @@ export default async function WaitlistPage({
             <tbody className="divide-y divide-gray-800">
               {waitlist.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-400">
+                  <td colSpan={5} className="px-6 py-8 text-center text-gray-400">
                     No waitlist entries found
                   </td>
                 </tr>
@@ -200,24 +197,12 @@ export default async function WaitlistPage({
                       <span className="text-white font-bold">#{entry.position}</span>
                     </td>
                     <td className="px-6 py-4">
-                      <div>
-                        <p className="text-white font-medium">{entry.full_name || 'N/A'}</p>
-                        <p className="text-gray-400 text-sm">{entry.email}</p>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <p className="text-gray-400 text-sm">{entry.phone || 'N/A'}</p>
+                      <p className="text-white font-medium">{entry.email}</p>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1 text-gray-400 text-sm">
-                        {entry.state ? (
-                          <>
-                            <MapPin className="w-3 h-3" />
-                            {entry.city ? `${entry.city}, ${entry.state}` : entry.state}
-                          </>
-                        ) : (
-                          'N/A'
-                        )}
+                        <MapPin className="w-3 h-3" />
+                        {entry.state || 'N/A'}
                       </div>
                     </td>
                     <td className="px-6 py-4">

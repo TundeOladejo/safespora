@@ -13,7 +13,7 @@ const NIGERIAN_STATES = [
 
 export async function POST(request: Request) {
   try {
-    const { email, fullName, phone, state, city, referralSource } = await request.json()
+    const { email, state } = await request.json()
 
     // Validation
     if (!email || !email.includes('@')) {
@@ -69,18 +69,14 @@ export async function POST(request: Request) {
     // Calculate next position (current count + 1)
     const nextPosition = (count || 0) + 1
 
-    // Add to waitlist with explicit position
+    // Add to waitlist with only email and state
     const { data: waitlistEntry, error: insertError } = await supabase
       .from('waitlist')
       .insert({
         email: email.toLowerCase(),
-        full_name: fullName,
-        phone,
         state,
-        city: city || null,
-        referral_source: referralSource,
         status: 'pending',
-        position: nextPosition // Make sure position is set
+        position: nextPosition
       })
       .select()
       .single()
@@ -108,7 +104,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      position: waitlistEntry.position, // This should now be defined
+      position: waitlistEntry.position,
       message: 'Successfully joined the waitlist!'
     })
   } catch (error: any) {

@@ -32,12 +32,8 @@ export default function WaitlistModal({
 }) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    fullName: "",
     email: "",
-    phone: "",
     state: "",
-    city: "",
-    referralSource: "",
   });
   
   // Honeypot field - should remain empty
@@ -61,9 +57,9 @@ export default function WaitlistModal({
       return;
     }
     
-    // Check if form was filled too quickly (less than 3 seconds - likely a bot)
+    // Check if form was filled too quickly (less than 2 seconds - likely a bot)
     const timeElapsed = Date.now() - formStartTime.current;
-    if (timeElapsed < 3000) {
+    if (timeElapsed < 2000) {
       console.log("Form filled too quickly - bot detected");
       toast.success("Welcome to SafeSpora! 🎉", {
         description: "Check your email for confirmation and updates.",
@@ -94,12 +90,8 @@ export default function WaitlistModal({
 
       // Reset form
       setFormData({ 
-        fullName: "", 
         email: "", 
-        phone: "", 
         state: "", 
-        city: "", 
-        referralSource: "" 
       });
       
       // Close modal
@@ -133,7 +125,7 @@ export default function WaitlistModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
         className="bg-[#0B0C0F] border border-[#1F2030] text-white 
-                   sm:max-w-md w-[95%] max-h-[60vh] overflow-y-auto 
+                   sm:max-w-md w-[95%] max-h-[50vh] overflow-y-auto 
                    rounded-lg mx-auto my-8 p-6"
       >
         <DialogHeader>
@@ -146,7 +138,7 @@ export default function WaitlistModal({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-5 mt-4">
+        <form onSubmit={handleSubmit} className="space-y-6 mt-6">
           {/* Honeypot field - hidden from real users */}
           <div className="hidden" aria-hidden="true">
             <Label htmlFor="website">Website</Label>
@@ -159,21 +151,6 @@ export default function WaitlistModal({
               value={honeypot}
               onChange={(e) => setHoneypot(e.target.value)}
               placeholder="Leave this empty"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="fullName" className="text-sm font-medium text-gray-300">
-              Full name <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="fullName"
-              required
-              value={formData.fullName}
-              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-              placeholder="John Doe"
-              className="bg-[#12131A] border-[#1F2030] text-white placeholder:text-gray-600 focus:border-red-500 focus:ring-red-500"
-              disabled={loading}
             />
           </div>
 
@@ -194,21 +171,6 @@ export default function WaitlistModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone" className="text-sm font-medium text-gray-300">
-              Phone number
-            </Label>
-            <Input
-              id="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              placeholder="+234 801 234 5678"
-              className="bg-[#12131A] border-[#1F2030] text-white placeholder:text-gray-600 focus:border-red-500 focus:ring-red-500"
-              disabled={loading}
-            />
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="state" className="text-sm font-medium text-gray-300">
               State <span className="text-red-500">*</span>
             </Label>
@@ -217,7 +179,7 @@ export default function WaitlistModal({
               required
               value={formData.state}
               onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-              className="w-full px-3 text-sm py-2 bg-[#12131A] border border-[#1F2030] text-white rounded-md focus:border-red-500 focus:ring-red-500 focus:outline-none"
+              className="w-full px-3 text-sm py-3 bg-[#12131A] border border-[#1F2030] text-white rounded-md focus:border-red-500 focus:ring-red-500 focus:outline-none"
               disabled={loading}
             >
               <option value="">Select your state</option>
@@ -226,41 +188,6 @@ export default function WaitlistModal({
                   {state}
                 </option>
               ))}
-            </select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="city" className="text-sm font-medium text-gray-300">
-              City
-            </Label>
-            <Input
-              id="city"
-              value={formData.city}
-              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-              placeholder="e.g. Lagos, Abuja, Port Harcourt"
-              className="bg-[#12131A] border-[#1F2030] text-white placeholder:text-gray-600 focus:border-red-500 focus:ring-red-500"
-              disabled={loading}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="referralSource" className="text-sm font-medium text-gray-300">
-              How did you hear about us?
-            </Label>
-            <select
-              id="referralSource"
-              value={formData.referralSource}
-              onChange={(e) => setFormData({ ...formData, referralSource: e.target.value })}
-              className="w-full text-sm px-3 py-2 bg-[#12131A] border border-[#1F2030] text-white rounded-md focus:border-red-500 focus:ring-red-500 focus:outline-none"
-              disabled={loading}
-            >
-              <option value="">Select an option</option>
-              <option value="social_media" className="bg-[#12131A] text-white">Social Media</option>
-              <option value="friend_referral" className="bg-[#12131A] text-white">Friend/Family</option>
-              <option value="search_engine" className="bg-[#12131A] text-white">Google/Search</option>
-              <option value="news_article" className="bg-[#12131A] text-white">News Article</option>
-              <option value="community_group" className="bg-[#12131A] text-white">Community Group</option>
-              <option value="other" className="bg-[#12131A] text-white">Other</option>
             </select>
           </div>
 
@@ -279,7 +206,7 @@ export default function WaitlistModal({
                 Joining...
               </span>
             ) : (
-              "Join Waiting List"
+              "Get Early Access"
             )}
           </Button>
 
