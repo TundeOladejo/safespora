@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Siren, MapPin, Users } from "@phosphor-icons/react";
 import WaitlistModal from "./WaitlistModal";
@@ -81,11 +82,14 @@ export default function Hero() {
                         className="bg-red-600 hover:bg-red-700"
                         onClick={() => setOpen(true)}
                     >
-                        Join Waiting List
+                        Get Early Access
                     </Button>
-                    {/* <Button size="lg" variant="outline">
-                        See How It Works
-                    </Button> */}
+
+                    <Button size="lg" variant="outline" asChild>
+                        <Link href="/waitlist">
+                            Full Waitlist Page
+                        </Link>
+                    </Button>
                 </div>
 
                 <WaitlistModal open={open} onOpenChange={setOpen} />

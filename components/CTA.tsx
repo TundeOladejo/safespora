@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { surface } from "@/lib/utils";
 
@@ -12,8 +13,10 @@ export default function CTA() {
           Be among the first 20,000 users to get early access to SafeSpora.
         </p>
 
-        <Button size="lg" className="mt-6 bg-red-600 hover:bg-red-700">
-          Join Waiting List
+        <Button size="lg" className="mt-6 bg-red-600 hover:bg-red-700" asChild>
+          <Link href="/waitlist">
+            Join Waiting List
+          </Link>
         </Button>
       </div>
     </section>
